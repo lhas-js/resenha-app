@@ -7,8 +7,8 @@ import Home from "./Home";
 const Routes = () => (
   <Router>
     <div>
-      <Route path="/" exact component={Home} />​
-      <Route path="/chat" component={Chat} />​
+      <Route path="/" exact component={Home} />
+      <Route path="/chat/:name/:room" component={Chat} />​
     </div>
   </Router>
 );

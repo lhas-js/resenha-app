@@ -1,13 +1,32 @@
-import React, { useState } from "react";
+import firebase from "firebase";
+import React, { useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
+import { Redirect } from "react-router-dom";
 
 const Home = () => {
   const [name, setName] = useState("");
-  const [room, setRoom] = useState("musica");
+  const [room, setRoom] = useState("");
+  const [rooms, setRooms] = useState([]);
+  const [redirectToChat, setRedirectToChat] = useState(false);
+
   const handleSubmit = event => {
     event.preventDefault();
-    alert(`Nome: ${name} - Sala: ${room}`);
+    setRedirectToChat(true);
   };
+
+  useEffect(() => {
+    const db = firebase.firestore();
+    db.collection("rooms").onSnapshot(snapshot => {
+      const response = snapshot.docs.map(snapshot => ({
+        id: snapshot.id,
+        ...snapshot.data()
+      }));
+      if (!room) setRoom(response[0].id);
+      setRooms(response);
+    });
+  }, [room]);
+
+  if (redirectToChat) return <Redirect to={`/chat/${name}/${room}`} />;
 
   return (
     <div style={{ margin: 20 }}>
@@ -29,9 +48,11 @@ const Home = () => {
             value={room}
             onChange={event => setRoom(event.target.value)}
           >
-            <option value="musica">Música</option>
-            <option value="cinema">Cinema</option>
-            <option value="adulto">Adulto</option>
+            {rooms.map(_room => (
+              <option value={_room.id} key={_room.id}>
+                {_room.label}
+              </option>
+            ))}
           </Form.Control>
         </Form.Group>
         <Button
