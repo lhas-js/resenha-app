@@ -30,13 +30,17 @@ const Home = () => {
   useEffect(() => {
     // Solicita ao Firestore todas as salas disponíveis
     db.collection("rooms").onSnapshot(snapshot => {
+      // Formata os dados em um objeto amigável
       const response = snapshot.docs.map(snapshot => ({
         id: snapshot.id,
+        // Tudo que estiver dentro do nosso documento será extendido
+        // para nosso objeto graças aos três pontos "..."
         ...snapshot.data()
       }));
+      // Atualizamos o nosso estado de salas com os dados formatados
       setRooms(response);
     });
-  }, [db, room]);
+  }, [db]);
 
   // Faz o redirecionamento caso o estado `redirectToChat` esteja habilitado
   if (redirectToChat) return <Redirect to={`/chat/${name}/${room}`} />;
