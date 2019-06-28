@@ -42,11 +42,24 @@ const Home = () => {
     });
   }, [db]);
 
+  console.log("room", room);
+  console.log("room", room.length);
+
   // Faz o redirecionamento caso o estado `redirectToChat` esteja habilitado
   if (redirectToChat) return <Redirect to={`/chat/${name}/${room}`} />;
 
   return (
     <div style={{ margin: 20 }}>
+      <img
+        style={{
+          margin: "0 auto",
+          display: "block",
+          width: "220px",
+          marginBottom: "20px"
+        }}
+        src="/logo.png"
+        alt="ResenhaApp"
+      />
       <Form onSubmit={handleSubmit}>
         <Form.Group>
           <Form.Control
@@ -72,11 +85,12 @@ const Home = () => {
           </Form.Control>
         </Form.Group>
         <Button
-          disabled={name.trim().length === 0}
+          disabled={name.trim().length === 0 || room.trim().length === 0}
           variant="primary"
           type="submit"
+          style={{ width: "100%" }}
         >
-          Entrar no ResenhaApp
+          Entrar
         </Button>
       </Form>
     </div>

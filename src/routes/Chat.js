@@ -69,6 +69,16 @@ const Chat = props => {
         padding: "20px"
       }}
     >
+      <img
+        style={{
+          margin: "0 auto",
+          display: "block",
+          width: "50px",
+          marginBottom: "10px"
+        }}
+        src="/logo--only-icon.png"
+        alt="ResenhaApp"
+      />
       <div
         ref={messageListRef}
         style={{ flex: 1, overflowY: "scroll", marginBottom: "20px" }}
