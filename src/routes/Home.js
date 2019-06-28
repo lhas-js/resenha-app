@@ -4,50 +4,62 @@ import { Button, Form } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 
 const Home = () => {
+  // Formulário
   const [name, setName] = useState("");
   const [room, setRoom] = useState("");
+
+  // Dados do Firebase
   const [rooms, setRooms] = useState([]);
+
+  // Redirecionamento de página
   const [redirectToChat, setRedirectToChat] = useState(false);
 
+  // Instância do Firestore
+  const db = firebase.firestore();
+
+  // Callback quando o formulário é enviado
   const handleSubmit = event => {
+    // Previne que a página seja recarregada
     event.preventDefault();
+
+    // Habilita o estado `redirectToChat`
     setRedirectToChat(true);
   };
 
+  // Callback quando a página é carregada
   useEffect(() => {
-    const db = firebase.firestore();
+    // Solicita ao Firestore todas as salas disponíveis
     db.collection("rooms").onSnapshot(snapshot => {
       const response = snapshot.docs.map(snapshot => ({
         id: snapshot.id,
         ...snapshot.data()
       }));
-      if (!room) setRoom(response[0].id);
       setRooms(response);
     });
-  }, [room]);
+  }, [db, room]);
 
+  // Faz o redirecionamento caso o estado `redirectToChat` esteja habilitado
   if (redirectToChat) return <Redirect to={`/chat/${name}/${room}`} />;
 
   return (
     <div style={{ margin: 20 }}>
       <Form onSubmit={handleSubmit}>
-        <Form.Group controlId="name">
-          <Form.Label>Seu nome</Form.Label>
+        <Form.Group>
           <Form.Control
             type="text"
-            placeholder="p.e. John Galt"
+            placeholder="Seu nome"
             value={name}
             onChange={event => setName(event.target.value)}
             required
           />
         </Form.Group>
-        <Form.Group controlId="room">
-          <Form.Label>Sala</Form.Label>
+        <Form.Group>
           <Form.Control
             as="select"
             value={room}
             onChange={event => setRoom(event.target.value)}
           >
+            <option value="">Escolher sala...</option>
             {rooms.map(_room => (
               <option value={_room.id} key={_room.id}>
                 {_room.label}
