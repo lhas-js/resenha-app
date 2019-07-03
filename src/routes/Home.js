@@ -29,7 +29,7 @@ const Home = () => {
   // Callback quando a página é carregada
   useEffect(() => {
     // Solicita ao Firestore todas as salas disponíveis
-    db.collection("rooms").onSnapshot(snapshot => {
+    const unsubscribe = db.collection("rooms").onSnapshot(snapshot => {
       // Formata os dados em um objeto amigável
       const response = snapshot.docs.map(snapshot => ({
         id: snapshot.id,
@@ -40,10 +40,9 @@ const Home = () => {
       // Atualizamos o nosso estado de salas com os dados formatados
       setRooms(response);
     });
-  }, [db]);
 
-  console.log("room", room);
-  console.log("room", room.length);
+    return unsubscribe;
+  }, [db]);
 
   // Faz o redirecionamento caso o estado `redirectToChat` esteja habilitado
   if (redirectToChat) return <Redirect to={`/chat/${name}/${room}`} />;

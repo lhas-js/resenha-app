@@ -1,6 +1,7 @@
 import firebase from "firebase";
 import React, { useEffect, useRef, useState } from "react";
-import { Badge, Button, Card, Form, ListGroup } from "react-bootstrap";
+import { Button, Card, Form, ListGroup } from "react-bootstrap";
+import { Link } from "react-router-dom/cjs/react-router-dom";
 import TimeAgo from "react-timeago";
 import buildFormatter from "react-timeago/lib/formatters/buildFormatter";
 import ptBr from "react-timeago/lib/language-strings/pt-br";
@@ -24,7 +25,8 @@ const Chat = props => {
   // Callback quando a página é carregada
   useEffect(() => {
     // Solicita ao Firestore todas as mensagens que pertencem a sala selecionada
-    db.collection(`rooms/${props.match.params.room}/messages`)
+    const unsubscribe = db
+      .collection(`rooms/${props.match.params.room}/messages`)
       // Ordena os documentos pela data de criação
       .orderBy("createdAt")
       .onSnapshot(snapshot => {
@@ -32,12 +34,16 @@ const Chat = props => {
           id: snapshot.id,
           ...snapshot.data()
         }));
+
         // Atualiza o componente com os documentos retornados
         setMessages(response);
+
         // Usa o objeto de referêNcia da lista de mensagens para alterar a posição
         // do scroll dele para o fim da lista toda vez que os documentos atualizarem
         messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
       });
+
+    return unsubscribe;
   }, [db, props]);
 
   // Callback quando o formulário de enviar nova mensagem é enviado
@@ -47,9 +53,9 @@ const Chat = props => {
 
     // Solicita ao Firestore que uma nova mensagem seja adicionada
     db.collection(`rooms/${props.match.params.room}/messages`).add({
-      createdAt: firebase.firestore.Timestamp.now(),
       username: props.match.params.name,
-      content: message
+      content: message,
+      createdAt: firebase.firestore.Timestamp.now()
     });
 
     // Limpa o campo de mensagem
@@ -69,16 +75,18 @@ const Chat = props => {
         padding: "20px"
       }}
     >
-      <img
-        style={{
-          margin: "0 auto",
-          display: "block",
-          width: "50px",
-          marginBottom: "10px"
-        }}
-        src="/logo--only-icon.png"
-        alt="ResenhaApp"
-      />
+      <Link to="/">
+        <img
+          style={{
+            margin: "0 auto",
+            display: "block",
+            width: "50px",
+            marginBottom: "10px"
+          }}
+          src="/logo--only-icon.png"
+          alt="ResenhaApp"
+        />
+      </Link>
       <div
         ref={messageListRef}
         style={{ flex: 1, overflowY: "scroll", marginBottom: "20px" }}
@@ -90,10 +98,12 @@ const Chat = props => {
               <time
                 style={{ fontSize: 12, marginLeft: 5, color: "var(--gray)" }}
               >
-                <TimeAgo date={_message.createdAt} formatter={formatter} />
+                <TimeAgo
+                  date={_message.createdAt.toDate()}
+                  formatter={formatter}
+                />
               </time>
               <p>{_message.content}</p>
-              <Badge pill variant="light" />
             </ListGroup.Item>
           ))}
         </ListGroup>
