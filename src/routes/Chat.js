@@ -47,7 +47,7 @@ const Chat = props => {
 
     // Solicita ao Firestore que uma nova mensagem seja adicionada
     db.collection(`rooms/${props.match.params.room}/messages`).add({
-      createdAt: +new Date(),
+      createdAt: firebase.firestore.Timestamp.now(),
       username: props.match.params.name,
       content: message
     });
